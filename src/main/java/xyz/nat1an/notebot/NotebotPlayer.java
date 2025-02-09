@@ -8,6 +8,7 @@ You should have received a copy of the GNU General Public License along with Not
 package xyz.nat1an.notebot;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.NoteBlock;
 import net.minecraft.block.enums.NoteBlockInstrument;
 import net.minecraft.client.MinecraftClient;
@@ -57,7 +58,7 @@ public class NotebotPlayer {
         if (!isNoteblock(pos)) return;
 
         mc.interactionManager.attackBlock(pos, Direction.UP);
-        mc.player.swingHand(Hand.MAIN_HAND);
+        //mc.player.swingHand(Hand.MAIN_HAND);
     }
 /*
     public static Instrument getInstrument(BlockPos pos) {
@@ -172,11 +173,12 @@ public class NotebotPlayer {
 
         BlockPos playerEyePos = new BlockPos((int) mc.player.getEyePos().x, (int) mc.player.getEyePos().y, (int) mc.player.getEyePos().z);
 
-        List<BlockPos> noteblocks = BlockPos.streamOutwards(
-                playerEyePos, 5, 5, 5
-        ).filter(
-                NotebotPlayer::isNoteblock).map(BlockPos::toImmutable
-        ).toList();
+        List<BlockPos> noteblocks = BlockPos.streamOutwards(playerEyePos, 6, 6, 6)
+                .filter(pos -> mc.world.getBlockState(pos).getBlock() == Blocks.NOTE_BLOCK)
+                .filter(pos -> mc.player.canInteractWithBlockAt(pos, 1))
+                .filter(NotebotPlayer::isValidScanSpot)
+                .map(BlockPos::toImmutable)
+                .toList();
 
         HashMap<NoteBlockInstrument, Integer> requiredInstruments = new HashMap<>();
         HashMap<NoteBlockInstrument, Integer> foundInstruments = new HashMap<>();
@@ -209,6 +211,11 @@ public class NotebotPlayer {
         return true;
     }
 
+    private static boolean isValidScanSpot(BlockPos pos) {
+        if (mc.world.getBlockState(pos).getBlock() != Blocks.NOTE_BLOCK) return false;
+        return mc.world.getBlockState(pos.up()).isAir();
+    }
+
     public static void onTick(MinecraftClient client) {
         if (!playing) return;
         if (mc.world == null || mc.player == null) {
@@ -239,7 +246,7 @@ public class NotebotPlayer {
                 continue;
 
             if (note != e.getValue()) {
-                if (tuneDelay < 5) {
+                if (tuneDelay <= 2) {
                     tuneDelay++;
                     return;
                 }
