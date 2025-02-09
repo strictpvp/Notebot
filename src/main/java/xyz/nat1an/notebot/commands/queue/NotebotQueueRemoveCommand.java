@@ -45,11 +45,11 @@ public class NotebotQueueRemoveCommand {
         try {
             name = NotebotPlayer.queue.remove(index);
         } catch (IndexOutOfBoundsException e) {
-            mc.player.sendMessage(Text.literal("§cIndex out of bounds."));
+            mc.player.sendMessage(Text.literal("§cIndex out of bounds."), false);
             return 0;
         }
 
-        mc.player.sendMessage(Text.literal("§6Removed §a" + name + "§6 at §e" + index + " §6from the queue."));
+        mc.player.sendMessage(Text.literal("§6Removed §a" + name + "§6 at §e" + index + " §6from the queue."), false);
 
         return 1;
     }

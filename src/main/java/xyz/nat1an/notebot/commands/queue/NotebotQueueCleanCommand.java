@@ -36,7 +36,8 @@ public class NotebotQueueCleanCommand {
         NotebotPlayer.queue.clear();
 
         mc.player.sendMessage(
-            Text.literal("§6Cleared §a" + amount + "§6 songs from the queue.")
+            Text.literal("§6Cleared §a" + amount + "§6 songs from the queue."),
+                false
         );
 
         return 1;

@@ -9,7 +9,7 @@ package xyz.nat1an.notebot.utils;
 
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
-import net.minecraft.block.enums.NoteBlockInstrument;
+import net.minecraft.block.enums.Instrument;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.text.Text;
@@ -32,23 +32,23 @@ import static xyz.nat1an.notebot.Notebot.mc;
 
 public class NotebotUtils {
     public static final String[] NOTE_NAMES = {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"};
-    public static final EnumMap<NoteBlockInstrument, ItemStack> INSTRUMENT_TO_ITEM = Util.make(new EnumMap<>(NoteBlockInstrument.class), it -> {
-        it.put(NoteBlockInstrument.HARP, new ItemStack(Items.DIRT));
-        it.put(NoteBlockInstrument.BASEDRUM, new ItemStack(Items.STONE));
-        it.put(NoteBlockInstrument.SNARE, new ItemStack(Items.SAND));
-        it.put(NoteBlockInstrument.HAT, new ItemStack(Items.GLASS));
-        it.put(NoteBlockInstrument.BASS, new ItemStack(Items.OAK_WOOD));
-        it.put(NoteBlockInstrument.FLUTE, new ItemStack(Items.CLAY));
-        it.put(NoteBlockInstrument.BELL, new ItemStack(Items.GOLD_BLOCK));
-        it.put(NoteBlockInstrument.GUITAR, new ItemStack(Items.WHITE_WOOL));
-        it.put(NoteBlockInstrument.CHIME, new ItemStack(Items.PACKED_ICE));
-        it.put(NoteBlockInstrument.XYLOPHONE, new ItemStack(Items.BONE_BLOCK));
-        it.put(NoteBlockInstrument.IRON_XYLOPHONE, new ItemStack(Items.IRON_BLOCK));
-        it.put(NoteBlockInstrument.COW_BELL, new ItemStack(Items.SOUL_SAND));
-        it.put(NoteBlockInstrument.DIDGERIDOO, new ItemStack(Items.PUMPKIN));
-        it.put(NoteBlockInstrument.BIT, new ItemStack(Items.EMERALD_BLOCK));
-        it.put(NoteBlockInstrument.BANJO, new ItemStack(Items.HAY_BLOCK));
-        it.put(NoteBlockInstrument.PLING, new ItemStack(Items.GLOWSTONE));
+    public static final EnumMap<javax.sound.midi.Instrument, ItemStack> INSTRUMENT_TO_ITEM = Util.make(new EnumMap<>(javax.sound.midi.Instrument.class), it -> {
+        it.put(Instrument.HARP, new ItemStack(Items.DIRT));
+        it.put(Instrument.BASEDRUM, new ItemStack(Items.STONE));
+        it.put(Instrument.SNARE, new ItemStack(Items.SAND));
+        it.put(Instrument.HAT, new ItemStack(Items.GLASS));
+        it.put(Instrument.BASS, new ItemStack(Items.OAK_WOOD));
+        it.put(Instrument.FLUTE, new ItemStack(Items.CLAY));
+        it.put(Instrument.BELL, new ItemStack(Items.GOLD_BLOCK));
+        it.put(Instrument.GUITAR, new ItemStack(Items.WHITE_WOOL));
+        it.put(Instrument.CHIME, new ItemStack(Items.PACKED_ICE));
+        it.put(Instrument.XYLOPHONE, new ItemStack(Items.BONE_BLOCK));
+        it.put(Instrument.IRON_XYLOPHONE, new ItemStack(Items.IRON_BLOCK));
+        it.put(Instrument.COW_BELL, new ItemStack(Items.SOUL_SAND));
+        it.put(Instrument.DIDGERIDOO, new ItemStack(Items.PUMPKIN));
+        it.put(Instrument.BIT, new ItemStack(Items.EMERALD_BLOCK));
+        it.put(Instrument.BANJO, new ItemStack(Items.HAY_BLOCK));
+        it.put(Instrument.PLING, new ItemStack(Items.GLOWSTONE));
     });
     private static final int[] NOTE_POSES = {6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17};
     private static Logger logger = Notebot.LOGGER;
@@ -252,10 +252,10 @@ public class NotebotUtils {
 
                     int key = input.read() - 33;
                     if (key < 0) {
-                        mc.player.sendMessage(Text.literal("Note @" + tick + " Key: " + key + " is below the 2-octave range!"), false);
+                        mc.player.sendMessage(Text.literal("Note @" + tick + " Key: " + key + " is below the 2-octave range!"));
                         key = Math.floorMod(key, 12);
                     } else if (key > 25) {
-                        mc.player.sendMessage(Text.literal("Note @" + tick + " Key: " + key + " is above the 2-octave range!"), false);
+                        mc.player.sendMessage(Text.literal("Note @" + tick + " Key: " + key + " is above the 2-octave range!"));
                         key = Math.floorMod(key, 12) + 12;
                     }
 

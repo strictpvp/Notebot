@@ -12,7 +12,7 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
-import net.minecraft.block.enums.NoteBlockInstrument;
+import net.minecraft.block.enums.Instrument;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
@@ -43,7 +43,7 @@ public class NotebotInfoCommand {
 
         result.append("§6Song: §e").append(song.name);
 
-        for (Map.Entry<NoteBlockInstrument, ItemStack> e : NotebotUtils.INSTRUMENT_TO_ITEM.entrySet()) {
+        for (Map.Entry<Instrument, ItemStack> e : NotebotUtils.INSTRUMENT_TO_ITEM.entrySet()) {
             int count = (int) song.requirements.stream().filter(n -> n.instrument == e.getKey().ordinal()).count();
 
             if (count != 0) {
@@ -61,7 +61,7 @@ public class NotebotInfoCommand {
             )
         );
 
-        mc.player.sendMessage(Text.literal(listRequirements(song)), false);
+        mc.player.sendMessage(Text.literal(listRequirements(song)));
 
         return 1;
     }

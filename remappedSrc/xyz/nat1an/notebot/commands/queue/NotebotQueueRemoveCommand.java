@@ -8,27 +8,29 @@ You should have received a copy of the GNU General Public License along with Not
 package xyz.nat1an.notebot.commands.queue;
 
 import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.text.Text;
 import xyz.nat1an.notebot.NotebotPlayer;
-import xyz.nat1an.notebot.suggestions.SongSuggestionProvider;
 
 import static xyz.nat1an.notebot.Notebot.mc;
 
-public class NotebotQueueAddCommand {
+public class NotebotQueueRemoveCommand {
     public static void register(CommandDispatcher<FabricClientCommandSource> clientCommandSourceCommandDispatcher,
                                 CommandRegistryAccess commandRegistryAccess) {
         clientCommandSourceCommandDispatcher.register(
             ClientCommandManager.literal("notebot")
                 .then(ClientCommandManager.literal("queue")
-                    .then(ClientCommandManager.literal("add")
-                        .then(ClientCommandManager.argument("song", StringArgumentType.greedyString())
-                            .suggests(new SongSuggestionProvider())
-                            .executes(NotebotQueueAddCommand::run)
+                    .then(ClientCommandManager.literal("remove")
+                        .then(
+                            ClientCommandManager.argument(
+                                    "index",
+                                    IntegerArgumentType.integer()
+                                )
+                                .executes(NotebotQueueRemoveCommand::run)
                         )
                     )
                 )
@@ -36,12 +38,18 @@ public class NotebotQueueAddCommand {
     }
 
     private static int run(CommandContext<FabricClientCommandSource> context) {
-        NotebotPlayer.queue.add(context.getArgument("song", String.class));
+        int index = context.getArgument("index", Integer.class);
 
-        mc.player.sendMessage(
-            Text.literal("§6Added §a" + context.getArgument("song", String.class) + "§6 to the queue."),
-                false
-        );
+        String name;
+
+        try {
+            name = NotebotPlayer.queue.remove(index);
+        } catch (IndexOutOfBoundsException e) {
+            mc.player.sendMessage(Text.literal("§cIndex out of bounds."));
+            return 0;
+        }
+
+        mc.player.sendMessage(Text.literal("§6Removed §a" + name + "§6 at §e" + index + " §6from the queue."));
 
         return 1;
     }

@@ -42,7 +42,7 @@ public class NotebotQueueCommand {
     }
 
     private static int run(CommandContext<FabricClientCommandSource> context) {
-        mc.player.sendMessage(Text.literal(listQueue()));
+        mc.player.sendMessage(Text.literal(listQueue()), false);
 
         return 1;
     }

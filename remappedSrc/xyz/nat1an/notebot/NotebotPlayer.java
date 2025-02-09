@@ -9,7 +9,7 @@ package xyz.nat1an.notebot;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.NoteBlock;
-import net.minecraft.block.enums.NoteBlockInstrument;
+import net.minecraft.block.enums.Instrument;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.registry.Registries;
 import net.minecraft.sound.BlockSoundGroup;
@@ -65,8 +65,8 @@ public class NotebotPlayer {
         return mc.world.getBlockState(pos).get(NoteBlock.INSTRUMENT);
     }
 */
-    public static NoteBlockInstrument getInstrumentUnderneath(BlockPos pos) {
-        if (!isNoteblock(pos)) return NoteBlockInstrument.HARP;
+    public static Instrument getInstrumentUnderneath(BlockPos pos) {
+        if (!isNoteblock(pos)) return Instrument.HARP;
 
         // Retrieve the block underneath
         BlockPos posUnderneath = pos.down();
@@ -76,44 +76,44 @@ public class NotebotPlayer {
         return blockToInstrument(blockUnderneath);
     }
 
-    public static NoteBlockInstrument blockToInstrument(Block block) {
+    public static Instrument blockToInstrument(Block block) {
 
         // Specific block checks
         Identifier blockId = Registries.BLOCK.getId(block);
         String blockIdString = blockId.toString();
-        NoteBlockInstrument instrument = NoteBlockInstrument.HARP;  // Default to Harp for any other block
+        Instrument instrument = Instrument.HARP;  // Default to Harp for any other block
 
 
         if (blockIdString.equals("minecraft:dirt" ) || blockIdString.equals("minecraft:air")) {
-            return NoteBlockInstrument.HARP;
+            return Instrument.HARP;
         } else if (blockIdString.equals("minecraft:clay")) {
-            return NoteBlockInstrument.FLUTE;
+            return Instrument.FLUTE;
         } else if (blockIdString.equals("minecraft:gold_block")) {
-            return NoteBlockInstrument.BELL;
+            return Instrument.BELL;
         } else if (blockIdString.equals("minecraft:packed_ice")) {
-            return NoteBlockInstrument.CHIME;
+            return Instrument.CHIME;
         } else if (blockIdString.equals("minecraft:bone_block")) {
-            return NoteBlockInstrument.XYLOPHONE;
+            return Instrument.XYLOPHONE;
         } else if (blockIdString.equals("minecraft:iron_block")) {
-            return NoteBlockInstrument.IRON_XYLOPHONE;
+            return Instrument.IRON_XYLOPHONE;
         } else if (blockIdString.equals("minecraft:soul_sand")) {
-            return NoteBlockInstrument.COW_BELL;
+            return Instrument.COW_BELL;
         } else if (blockIdString.equals("minecraft:pumpkin")) {
-            return NoteBlockInstrument.DIDGERIDOO;
+            return Instrument.DIDGERIDOO;
         } else if (blockIdString.equals("minecraft:emerald_block")) {
-            return NoteBlockInstrument.BIT;
+            return Instrument.BIT;
         } else if (blockIdString.equals("minecraft:hay_block")) {
-            return NoteBlockInstrument.BANJO;
+            return Instrument.BANJO;
         } else if (blockIdString.equals("minecraft:glowstone")) {
-            return NoteBlockInstrument.PLING;
+            return Instrument.PLING;
         } else if (blockIdString.equals("minecraft:sand") || blockIdString.equals("minecraft:gravel") || blockIdString.equals("minecraft:concrete_powder")) {
-            return NoteBlockInstrument.SNARE;
+            return Instrument.SNARE;
         } else if (Arrays.asList("minecraft:stone", "minecraft:cobblestone", "minecraft:blackstone", "minecraft:netherrack", "minecraft:nylium", "minecraft:obsidian",
                 "minecraft:quartz", "minecraft:sandstone", "minecraft:ores", "minecraft:bricks", "minecraft:corals",
                 "minecraft:respawn_anchor", "minecraft:bedrock", "minecraft:concrete").contains(blockIdString)) {
-            return NoteBlockInstrument.BASEDRUM;
+            return Instrument.BASEDRUM;
         } else if (blockIdString.equals("minecraft:glass")) {
-            return NoteBlockInstrument.HAT;
+            return Instrument.HAT;
         }
 
 
@@ -121,16 +121,16 @@ public class NotebotPlayer {
 
         // Check for blocks with specific materials
         if (material.equals(BlockSoundGroup.WOOD)) {
-            return NoteBlockInstrument.BASS;
+            return Instrument.BASS;
         }
         if (material.equals(BlockSoundGroup.WOOL)) {
-            return NoteBlockInstrument.GUITAR;
+            return Instrument.GUITAR;
         }
         if (material.equals(BlockSoundGroup.GLASS)) {
-            return NoteBlockInstrument.HAT;
+            return Instrument.HAT;
         }
         if (material.equals(BlockSoundGroup.STONE)) {
-            return NoteBlockInstrument.BASEDRUM;
+            return Instrument.BASEDRUM;
         }
 
 
@@ -156,11 +156,11 @@ public class NotebotPlayer {
 
         try {
             if (!mc.interactionManager.getCurrentGameMode().isSurvivalLike()) {
-                mc.player.sendMessage(Text.literal("§cNot in Survival mode!"), false);
+                mc.player.sendMessage(Text.literal("§cNot in Survival mode!"));
 
                 return false;
             } else if (song == null) {
-                mc.player.sendMessage(Text.literal("§6No song in queue!, Use §c/notebot queue add §6to add a song."), false);
+                mc.player.sendMessage(Text.literal("§6No song in queue!, Use §c/notebot queue add §6to add a song."));
 
                 return false;
             }
@@ -178,16 +178,16 @@ public class NotebotPlayer {
                 NotebotPlayer::isNoteblock).map(BlockPos::toImmutable
         ).toList();
 
-        HashMap<NoteBlockInstrument, Integer> requiredInstruments = new HashMap<>();
-        HashMap<NoteBlockInstrument, Integer> foundInstruments = new HashMap<>();
+        HashMap<Instrument, Integer> requiredInstruments = new HashMap<>();
+        HashMap<Instrument, Integer> foundInstruments = new HashMap<>();
 
         for (Note note : song.requirements) {
-            NoteBlockInstrument instrument = NoteBlockInstrument.values()[note.instrument];
+            Instrument instrument = Instrument.values()[note.instrument];
             requiredInstruments.put(instrument, requiredInstruments.getOrDefault(instrument, 0) + 1);
             for (BlockPos pos : noteblocks) {
                 if (blockPitches.containsKey(pos)) continue;
 
-                NoteBlockInstrument blockInstrument = getInstrumentUnderneath(pos);
+                Instrument blockInstrument = getInstrumentUnderneath(pos);
                 if (note.instrument == blockInstrument.ordinal() && blockPitches.entrySet().stream().filter(e -> e.getValue() == note.pitch).noneMatch(e -> getInstrumentUnderneath(e.getKey()).ordinal() == blockInstrument.ordinal())) {
                     blockPitches.put(pos, note.pitch);
                     foundInstruments.put(blockInstrument, foundInstruments.getOrDefault(blockInstrument, 0) + 1);
@@ -196,13 +196,13 @@ public class NotebotPlayer {
             }
         }
 
-        for (NoteBlockInstrument instrument : requiredInstruments.keySet()) {
+        for (Instrument instrument : requiredInstruments.keySet()) {
             int requiredCount = requiredInstruments.get(instrument);
             int foundCount = foundInstruments.getOrDefault(instrument, 0);
             int missingCount = requiredCount - foundCount;
 
             if (missingCount > 0) {
-                mc.player.sendMessage(Text.literal("§6Warning: Missing §c" + missingCount + " §6" + instrument + " Noteblocks"), false);
+                mc.player.sendMessage(Text.literal("§6Warning: Missing §c" + missingCount + " §6" + instrument + " Noteblocks"));
             }
         }
 
@@ -214,7 +214,7 @@ public class NotebotPlayer {
 
         if (song == null) {
             if (queue.isEmpty()) {
-                mc.player.sendMessage(Text.literal("§cYou have no songs in your queue!"), false);
+                mc.player.sendMessage(Text.literal("§cYou have no songs in your queue!"));
                 stop();
                 return;
             }
@@ -260,14 +260,14 @@ public class NotebotPlayer {
                 song = null;
                 return;
             } else {
-                mc.player.sendMessage(Text.literal("§6The queue is empty, stopping..."), false);
+                mc.player.sendMessage(Text.literal("§6The queue is empty, stopping..."));
                 stop();
                 return;
             }
         }
 
         if (timer == -10) {
-            mc.player.sendMessage(Text.literal("§6Now Playing: §a" + song.filename), false);
+            mc.player.sendMessage(Text.literal("§6Now Playing: §a" + song.filename));
         }
 
         timer++;
