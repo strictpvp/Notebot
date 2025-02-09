@@ -211,6 +211,10 @@ public class NotebotPlayer {
 
     public static void onTick(MinecraftClient client) {
         if (!playing) return;
+        if (mc.world == null || mc.player == null) {
+            playing = false;
+            return;
+        }
 
         if (song == null) {
             if (queue.isEmpty()) {
