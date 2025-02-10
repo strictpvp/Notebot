@@ -9,13 +9,11 @@ package xyz.nat1an.notebot;
 
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 import xyz.nat1an.notebot.commands.NotebotInfoCommand;
 import xyz.nat1an.notebot.commands.NotebotStartCommand;
 import xyz.nat1an.notebot.commands.NotebotStopCommand;
-import xyz.nat1an.notebot.commands.queue.NotebotQueueAddCommand;
-import xyz.nat1an.notebot.commands.queue.NotebotQueueCleanCommand;
-import xyz.nat1an.notebot.commands.queue.NotebotQueueCommand;
-import xyz.nat1an.notebot.commands.queue.NotebotQueueRemoveCommand;
+import xyz.nat1an.notebot.commands.queue.*;
 
 public class ModRegistries {
     public static void registerModStuff() {
@@ -32,9 +30,12 @@ public class ModRegistries {
         ClientCommandRegistrationCallback.EVENT.register(NotebotQueueAddCommand::register);
         ClientCommandRegistrationCallback.EVENT.register(NotebotQueueRemoveCommand::register);
         ClientCommandRegistrationCallback.EVENT.register(NotebotQueueCommand::register);
+        ClientCommandRegistrationCallback.EVENT.register(NotebotQueueSkipCommand::register);
     }
 
     private static void registerEvents() {
         ClientTickEvents.END_CLIENT_TICK.register(NotebotPlayer::onTick);
+        ClientReceiveMessageEvents.CHAT.register(Notebot.commandManager::onChat);
+        ClientReceiveMessageEvents.GAME.register(Notebot.commandManager::onServerChat);
     }
 }

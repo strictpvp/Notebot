@@ -12,6 +12,8 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.NoteBlock;
 import net.minecraft.block.enums.NoteBlockInstrument;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
+import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
 import net.minecraft.registry.Registries;
 import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.text.Text;
@@ -40,7 +42,6 @@ public class NotebotPlayer {
 
     /* The loaded song */
     public static Song song;
-    public static List<String> trail = new ArrayList<>();
     public static List<String> queue = new ArrayList<>();
 
     /* Map of noteblocks and their pitch around the player [blockpos:pitch] */
@@ -57,7 +58,8 @@ public class NotebotPlayer {
     public static void playBlock(BlockPos pos) {
         if (!isNoteblock(pos)) return;
 
-        mc.interactionManager.attackBlock(pos, Direction.UP);
+        mc.player.networkHandler.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.START_DESTROY_BLOCK, pos, Direction.DOWN, 0));
+        //mc.interactionManager.attackBlock(pos, Direction.UP);
         //mc.player.swingHand(Hand.MAIN_HAND);
     }
 /*
@@ -246,7 +248,7 @@ public class NotebotPlayer {
                 continue;
 
             if (note != e.getValue()) {
-                if (tuneDelay <= 2) {
+                if (tuneDelay > 33) {
                     tuneDelay++;
                     return;
                 }
@@ -254,8 +256,13 @@ public class NotebotPlayer {
                 int neededNote = e.getValue() < note ? e.getValue() + 25 : e.getValue();
                 int reqTunes = Math.min(25, neededNote - note);
                 for (int i = 0; i < reqTunes; i++)
-                    mc.interactionManager.interactBlock(mc.player,
-                            Hand.MAIN_HAND, new BlockHitResult(Vec3d.ofCenter(e.getKey(), 1), Direction.UP, e.getKey(), true));
+                    mc.getNetworkHandler().sendPacket(
+                            new PlayerInteractBlockC2SPacket(
+                                    Hand.MAIN_HAND,
+                                    new BlockHitResult(Vec3d.ofCenter(e.getKey(), 1), Direction.UP, e.getKey(), true),
+                                    0
+                            )
+                    );
 
                 tuneDelay = 0;
 
